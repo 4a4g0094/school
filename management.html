@@ -1,0 +1,157 @@
+<!DOCTYPE HTML>
+<!--
+	Story by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Story by HTML5 UP</title>
+
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+
+	</head>
+	
+			
+	<body class="is-preload">
+	
+		<form action='management.php' method='post'>
+			公告標題：<input type='text' name='bulletinTitle' style='width:300px'><br>
+			公告內容：<br>
+			<textarea rows='10' name='bulletinContent' cols='20'></textarea><br>
+			<input type='submit' name='add' value='新增'><br><br><br>
+		</form>
+		
+		<form>
+			<div class="contentt" style="margin-top:2rem;">
+				<ol id="bulletinBtns" style="float: none;">
+					<li id="bulletinBtn1"></li>
+					<li id="bulletinBtn2"></li>
+					<li id="bulletinBtn3"></li>
+					<li id="bulletinBtn4"></li>
+					<li id="bulletinBtn5"></li>
+				</ol>  
+			</div>
+			<input type='button' name='del' value='刪除' style="float:left" onclick="delect()">
+		</form>
+		
+		<div style="margin-left: 1.2rem;margin-bottom: 5rem;float:left;">
+			<button class="button small" style="float:left" onclick="backPage()"><</button>
+			<p id="bulletinPage" style="float:left;margin:0.1rem 1rem 0rem 1rem;">0</p>
+			<button class="button small" style="float:left" onclick="nextPage()">></button>
+		</div>
+		
+		
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+			
+		
+		<script>
+				var bulletinItem = [];
+				var bulletinItemDelect = [0, 0, 0, 0, 0];
+							
+				var bulletinPage = 0;
+				var i = 0, j = 0, k = 0;
+				var itemSQL, itemCount, itemSQLSplit, itemPushToData, getTime;	
+				
+				$.post("bulletin.php", {}, function(result){
+					itemSQL = result.split(":;:");
+					itemCount = itemSQL[itemSQL.length-1];
+				});
+
+				// Get the button that opens the modal
+				var bulletinBtn1 = document.getElementById("bulletinBtn1");
+				var bulletinBtn2 = document.getElementById("bulletinBtn2");
+				var bulletinBtn3 = document.getElementById("bulletinBtn3");
+				var bulletinBtn4 = document.getElementById("bulletinBtn4");
+				var bulletinBtn5 = document.getElementById("bulletinBtn5");
+
+				// Get the <span> element that closes the modal
+				var span = document.getElementById('close');
+				
+				// When the user clicks the button, open the modal 
+				bulletinBtn1.onclick = function() {
+				   setbulletinBtnOpacity(1, bulletinPage*5-5)
+				}
+				bulletinBtn2.onclick = function() {
+				  setbulletinBtnOpacity(2, bulletinPage*5-4);
+				}
+				bulletinBtn3.onclick = function() {
+				  setbulletinBtnOpacity(3, bulletinPage*5-3);
+				}
+				bulletinBtn4.onclick = function() {
+				  setbulletinBtnOpacity(4, bulletinPage*5-2);
+				}
+				bulletinBtn5.onclick = function() {
+				  setbulletinBtnOpacity(5, bulletinPage*5-1);
+				}
+				
+				function setbulletinBtnOpacity(num, num2){
+					if(bulletinItemDelect[num-1] == 0){
+						$("#bulletinBtn" + num).css("opacity","0.2");
+						bulletinItemDelect[num-1] = bulletinItem[num2][1];
+					}else{
+						$("#bulletinBtn" + num).css("opacity","1");
+						bulletinItemDelect[num-1] = 0;
+					}
+				}
+			
+				function setBulletin(){
+					$("#bulletinPage").empty();
+					$("#bulletinPage").append(bulletinPage);
+					for(k=1; k<6; k++){
+						$("#bulletinBtn" + k).empty();
+						$("#bulletinBtn" + k).css("visibility","hidden");	
+						$("#bulletinBtn" + k).css("opacity","1");
+						bulletinItemDelect[k-1] = 0;
+					}
+					for(j=bulletinPage*5,i=j-5,k=1; i<j; i++,k++){
+						$("#bulletinBtn" + k).css("visibility","visible");	
+						$("#bulletinBtn" + k).append(bulletinItem[i][0]);			
+					}
+				}
+				setBulletin();
+				
+				function backPage(){
+					if(bulletinPage > 1){
+						bulletinPage--;
+						setBulletin();
+					}
+				}
+				
+				function nextPage(){
+					if(bulletinPage == 0){									
+						for(i=itemCount-1; i>=0; i--){
+							itemSQLSplit = itemSQL[i].split(":,:");
+							itemPushToData = [itemSQLSplit[1], itemSQLSplit[0]];
+							bulletinItem.push(itemPushToData);
+						}
+					}
+					if(bulletinPage * 5 < bulletinItem.length){
+						bulletinPage++;
+						setBulletin();
+					}
+				}
+				
+				function delect(){
+					var id1 = "id1=" + bulletinItemDelect[0] + "&";
+					var id2 = "id2=" + bulletinItemDelect[1] + "&";
+					var id3 = "id3=" + bulletinItemDelect[2] + "&";
+					var id4 = "id4=" + bulletinItemDelect[3] + "&";
+					var id5 = "id5=" + bulletinItemDelect[4];
+					var test = "management.php?"+id1+id2+id3+id4+id5;
+					location.replace(test);
+				}
+		</script>
+
+	</body>
+</html>
